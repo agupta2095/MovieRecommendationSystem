@@ -4,7 +4,7 @@ import numpy as np
 
 def get_dict_movie():
   dict_movie_id={}
-  data = pd.read_csv("./dataset/ml-latest-small/"+"movies.csv")
+  data = pd.read_csv("website/recommedation/dataset/ml-latest-small/"+"movies.csv")
   list_movie_id=data["movieId"].unique()
   list_movie_id.sort()
   total_movies=len(list_movie_id)
@@ -14,7 +14,7 @@ def get_dict_movie():
 
 def get_dict_tag():
   dict_tag={}
-  data = pd.read_csv("./dataset/ml-latest-small/"+"tags.csv")
+  data = pd.read_csv("website/recommedation/dataset/ml-latest-small/"+"tags.csv")
   list_tag=data["tag"].unique()
   total_tags=len(list_tag)
   for num, tag in enumerate(list_tag):
@@ -26,7 +26,7 @@ def get_movie_matrix():
   dict_movie_id, total_movies= get_dict_movie()
   dict_tag, total_tags =get_dict_tag()
   movie_tag_matrix=np.zeros((total_tags,total_movies))
-  data = pd.read_csv("./dataset/ml-latest-small/" + "tags.csv")
+  data = pd.read_csv("website/recommedation/dataset/ml-latest-small/" + "tags.csv")
   for _, entries in data.iterrows():
 
 
@@ -47,7 +47,6 @@ def get_correlation_matrix(movie_tag_matrix):
 
 
 
-
 def user_rating_to_vector(user_ratings, dict_movie_id):
   user_vector=np.zeros(( len(dict_movie_id), 1))
   for movieId, rating in user_ratings.items():
@@ -63,7 +62,7 @@ def content_based_ratings(movie_tag_corr, user_ratings, dict_movie_id):
   if pred_ratings.any():
     pred_ratings=4*(pred_ratings-min(pred_ratings))/(max(pred_ratings)-min(pred_ratings))+1.0
   else:
-    pred_ratings[:]=1
+    pred_ratings[:]=3
 
   for movieId, _ in user_ratings.items():
     ind= dict_movie_id[movieId]
@@ -76,7 +75,7 @@ def val_to_key(val, dictionary):
 
 
 def get_dict_id_name():
-  movie_names=pd.read_csv("./dataset/ml-latest-small/"+"movies.csv")
+  movie_names=pd.read_csv("website/recommedation/dataset/ml-latest-small/"+"movies.csv")
   dict_id_name={}
   for _,entries in movie_names.iterrows():
     dict_id_name[entries["movieId"]]=entries["title"]
@@ -106,7 +105,7 @@ def example():
   movie_tag_corr = get_correlation_matrix(movie_tag_matrix)
 
 
-  movieIds, movieNames=search_movie("holocaust", movie_tag_matrix, dict_tag, dict_movie_id, dict_id_name, num_movies=2)
+  movieIds, movieNames=search_movie("caprio", movie_tag_matrix, dict_tag, dict_movie_id, dict_id_name, num_movies=2)
 
   user_ratings={}
 
@@ -146,18 +145,21 @@ def get_recommended_movies(user_ratings):
   print("Predicted Movies")
 
   output=["Recommended Movies List"]
+  movie_ids=[]
   for i in range(5):
     ind = np.argmax(pred_ratings)
     movie_id_pred = val_to_key(ind, dict_movie_id)
-
-    print(dict_id_name[movie_id_pred], pred_ratings[ind])
+    movie_ids.append(movie_id_pred)
+    print(dict_id_name[movie_id_pred], pred_ratings[ind], movie_ids)
     pred_ratings[ind] = -1e8
 
     output.append(dict_id_name[movie_id_pred])
 
-  return output
+  return output,movie_ids
 
 
+if __name__=="__main__":
+  example()
 
 
 
