@@ -1,9 +1,9 @@
 import torch
 import pickle
 import numpy as np
-from utils import read_pickle
+from .utils import read_pickle
 import matplotlib.pyplot as plt
-def matrix_factorization(input_file="./dataset/UM_dictionary.pkl",
+def matrix_factorization(input_file="./dataset/UM_dictionary_old.pkl",
                          output_file="./dataset/matrix_factorized.pkl"):
 
 

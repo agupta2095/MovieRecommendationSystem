@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-
+from .utils import normalize_predictions
 
 def get_dict_movie():
   dict_movie_id={}
@@ -55,14 +55,12 @@ def user_rating_to_vector(user_ratings, dict_movie_id):
   return user_vector
 
 
+
 def content_based_ratings(movie_tag_corr, user_ratings, dict_movie_id):
   user_vector=user_rating_to_vector(user_ratings, dict_movie_id)
   pred_ratings=np.matmul(movie_tag_corr, user_vector)
 
-  if pred_ratings.any():
-    pred_ratings=4*(pred_ratings-min(pred_ratings))/(max(pred_ratings)-min(pred_ratings))+1.0
-  else:
-    pred_ratings[:]=3
+  pred_ratings=normalize_predictions(pred_ratings)
 
   for movieId, _ in user_ratings.items():
     ind= dict_movie_id[movieId]
@@ -156,6 +154,18 @@ def get_recommended_movies(user_ratings):
     output.append(dict_id_name[movie_id_pred])
 
   return output,movie_ids
+
+
+
+def get_ratings_content(user_ratings):
+  dict_movie_id, _=get_dict_movie()
+  dict_id_name =get_dict_id_name()
+  movie_tag_matrix = get_movie_matrix()
+  movie_tag_corr = get_correlation_matrix(movie_tag_matrix)
+
+  pred_ratings = content_based_ratings(movie_tag_corr, user_ratings, dict_movie_id)
+  return pred_ratings
+
 
 
 if __name__=="__main__":

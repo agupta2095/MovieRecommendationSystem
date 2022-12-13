@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import pickle
 
-def path_to_matrix(input_file="./dataset/ml-latest-small/" , output_file="dataset/UM_dictionary.pkl" ):
+def path_to_matrix(input_file="website/recommendation/dataset/ml-latest-small/" , output_file="website/recommendation/dataset/UM_dictionary_old.pkl" ):
 
     data = pd.read_csv(input_file+"ratings.csv")
     #print(data)

@@ -1,11 +1,13 @@
 import os
 from flask import Blueprint,request, render_template
 import pandas as pd
-from website.recommedation.content_based_filtering import get_dict_id_name, get_recommended_movies
+from website.recommedation.content_based_filtering import get_dict_id_name,get_dict_movie, get_recommended_movies, get_ratings_content,val_to_key
+from website.recommedation.collaborative_filtering import get_ratings_collaborative
 from website.recommedation.utils import read_pickle, grab_highest_rated, get_poster
 from flask_login import login_user, login_required, logout_user, current_user
 from .models import Watched, Recommendation
 from . import db
+import numpy as np
 movie = Blueprint('movie', __name__)
 
 
@@ -14,7 +16,7 @@ movie = Blueprint('movie', __name__)
 ratings = pd.read_csv('website/recommedation/dataset/ml-latest-small/ratings.csv')
 movies = pd.read_csv('website/recommedation/dataset/ml-latest-small/movies.csv')
 
-output_read_file = "website/recommedation/dataset/UM_dictionary.pkl"
+output_read_file = "website/recommedation/dataset/UM_dictionary_old.pkl"
 input_read_file = "website/recommedation/dataset/ml-latest-small/"
 data_read = read_pickle(output_read_file)
 
@@ -61,6 +63,35 @@ def string_to_list(string):
     print(lists)
     return [int(l) for l in lists if len(l)>0]
 
+
+
+def get_recommendataions(user_ratings, alpha=1.0):
+    dict_movie_id, _ = get_dict_movie()
+    dict_id_name = get_dict_id_name()
+    pred_ratings_content = get_ratings_content(user_ratings)
+    pred_ratings_collaborative = get_ratings_collaborative(user_ratings)
+
+    pred_ratings=alpha*pred_ratings_content.reshape(-1)+(1-alpha)*pred_ratings_collaborative.reshape(-1)
+
+
+    for key, val in user_ratings.items():
+        print(dict_id_name[key], val)
+
+    print("================")
+    print("Predicted Movies")
+
+    output = ["Recommended Movies List"]
+    movie_ids = []
+    for i in range(5):
+        ind = np.argmax(pred_ratings)
+        movie_id_pred = val_to_key(ind, dict_movie_id)
+        movie_ids.append(movie_id_pred)
+        print(dict_id_name[movie_id_pred], pred_ratings[ind], movie_ids)
+        pred_ratings[ind] = -1e8
+
+        output.append(dict_id_name[movie_id_pred])
+
+    return output, movie_ids
 #----------------------------------------------------------------------------------------------------------------------------------------------------
 
 # root api direct to index.html (home page)
@@ -85,8 +116,6 @@ def rate_movies():
                                   rec_movies=5)
     for r in current_user.recommended:
         movieIds=string_to_list(r.data)
-
-
 
     movie_titles = []
     for id in movieIds:
@@ -133,9 +162,7 @@ def recommend2():
             user_ratings[name]=rating
 
     user_ratings_ids=get_movie_ids(user_ratings)
-    output, movie_ids = get_recommended_movies(user_ratings_ids)
-
-
+    output, movie_ids =  get_recommendataions(user_ratings_ids)
 
     new_recommendation=Recommendation(data=list_to_string(movie_ids), user_id=current_user.id)
     db.session.add(new_recommendation)
@@ -146,26 +173,26 @@ def recommend2():
 
 
     return render_template('index.html', user=current_user, recommended_movie=output)
-
-@movie.route('/recommend',methods=['POST'])
-@login_required
-def recommend():
-    features = [str(x) for x in request.form.values()]
-    print(features)
-    movie_name = str(features[0])
-    movie_rating = float(features[1])
-
-    dict_id_name = get_dict_id_name()
-    movieIds=get_movie_id([movie_name], dict_id_name)
-
-    user_ratings={}
-    for id, rating in zip(movieIds,[movie_rating] ):
-        user_ratings[id]=rating
-    output=get_recommended_movies(user_ratings)
-
-    return render_template('index.html',user=current_user, recommended_movie=output)
-
-
+#
+# @movie.route('/recommend',methods=['POST'])
+# @login_required
+# def recommend():
+#     features = [str(x) for x in request.form.values()]
+#     print(features)
+#     movie_name = str(features[0])
+#     movie_rating = float(features[1])
+#
+#     dict_id_name = get_dict_id_name()
+#     movieIds=get_movie_id([movie_name], dict_id_name)
+#
+#     user_ratings={}
+#     for id, rating in zip(movieIds,[movie_rating] ):
+#         user_ratings[id]=rating
+#     output=get_recommended_movies(user_ratings)
+#
+#     return render_template('index.html',user=current_user, recommended_movie=output)
+#
+#
 
 
 
