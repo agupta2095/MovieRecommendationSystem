@@ -32,7 +32,6 @@
   <div class="collapse navbar-collapse" id="navbar">
     <div class="navbar-nav">
       {% if user.is_authenticated %}
-      <a class="nav-item nav-link" id="home" href="/">Home</a>
       <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
       {% else %}
       <a class="nav-item nav-link" id="login" href="/login">Login</a>
@@ -49,7 +48,12 @@
    {% for each in recommended_movie %}      
    <h4>
     {{ each }}
-  </h4> 
+  </h4>
+       <div class = "text-center">
+           {% if loop.index <= 5 %}
+           <img src={{posters[loop.index-1]}} width="250" height="300">
+           {% endif %}
+       </div>
     {% endfor %}
         <div class="col-lg-12">
 
@@ -61,7 +65,6 @@
         </div>
   </div>
  </div>
-
 
 </body>
 </html>

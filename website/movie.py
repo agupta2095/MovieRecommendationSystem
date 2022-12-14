@@ -10,25 +10,12 @@ from . import db
 import numpy as np
 movie = Blueprint('movie', __name__)
 
-
-#----------------------------------------------Machine Learning Script for recommendation of movies-----------------------------------------------
-
 ratings = pd.read_csv('website/recommedation/dataset/ml-latest-small/ratings.csv')
 movies = pd.read_csv('website/recommedation/dataset/ml-latest-small/movies.csv')
-
+alpha=1.0
 output_read_file = "website/recommedation/dataset/UM_dictionary_old.pkl"
 input_read_file = "website/recommedation/dataset/ml-latest-small/"
 data_read = read_pickle(output_read_file)
-
-# we basically need the rating and userID
-# A DataFrame object has two axes: “axis 0” and “axis 1”. “axis 0” represents rows and “axis 1” represents columns
-ratings = pd.merge(movies,ratings).drop(['genres','timestamp'],axis=1)
-
-user_ratings = ratings.pivot_table(index=['userId'],columns=['title'],values='rating')
-# Let's drop/remove the movies which have less than 10 users who rated it and fill remaining NaN with 0
-user_ratings = user_ratings.dropna(thresh=10,axis=1).fillna(0)
-
-
 
 user_ratings2={}
 user_ratings_ids = {}
@@ -54,9 +41,12 @@ def get_movie_ids(user_rating_dict):
 
 
 def list_to_string(lists ):
-    string=""
-    for l in lists:
-        string+=str(l)+","
+    string = ""
+    for i, l in enumerate(lists):
+        if i == len(lists)-1:
+            string += str(l)
+        else:
+            string += str(l)+","
     return string
 def string_to_list(string):
     lists=string.split(",")
@@ -65,7 +55,7 @@ def string_to_list(string):
 
 
 
-def get_recommendataions(user_ratings, alpha=1.0):
+def get_recommendataions(user_ratings):
     dict_movie_id, _ = get_dict_movie()
     dict_id_name = get_dict_id_name()
     pred_ratings_content = get_ratings_content(user_ratings)
@@ -109,11 +99,11 @@ def home_page():
 @movie.route('/rate_movies',methods=['GET','POST'])
 @login_required
 def rate_movies():
-    print("here")
-
     movieIds = grab_highest_rated(matrix=data_read["matrix"],
                                   unique_movies=data_read["unique_movies"],
-                                  rec_movies=5)
+                                  rec_movies=7)
+    print(movieIds)
+    print(current_user.id)
     for r in current_user.recommended:
         movieIds=string_to_list(r.data)
 
@@ -134,8 +124,6 @@ def submit_top_rated():
     features = [str(x) for x in request.form.values()]
     movie_rating = int(features[0])
     if request.method == 'POST':
-        if 'rating' in request.form:
-            content = int(request.form['rating'])
         if 'movie' in request.form:
             movieName = (request.form['movie'])
 
@@ -152,7 +140,7 @@ def submit_top_rated():
 def recommend2():
     user_ratings={}
     for w in current_user.rated:
-        lists=w.data.split(":")
+        lists=w.data.rsplit(":", 1)
         if len(lists) > 1:
             name=lists[0]
 
@@ -168,7 +156,8 @@ def recommend2():
     print("Recommended movie ids")
     for r in current_user.recommended:
         print(r.data)
-    return render_template('index.html', user=current_user, recommended_movie=output)
+    posters = get_poster(movie_ids)
+    return render_template('index.html', user=current_user, recommended_movie=output, posters=posters)
 
 
 

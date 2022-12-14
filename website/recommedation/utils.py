@@ -74,8 +74,8 @@ def get_poster_link(id):
        if  row[0]==id:
            return row[1]
        elif row[0]>id:
-           return ''
-    return ''
+           return 'https://movienewsletters.net/photos/000000h1.jpg'
+    return 'https://movienewsletters.net/photos/000000h1.jpg'
 
 def get_poster(movie_ids):
     links=[]
