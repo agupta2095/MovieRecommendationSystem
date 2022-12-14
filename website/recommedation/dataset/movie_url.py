@@ -2,20 +2,17 @@ import csv
 import pandas as pd
 import urllib.parse
 import urllib.request
-from bs4 import BeautifulSoup
 import io
 
+#Function to obtain movie posters from IMDB site
+#The movie posters URL are stored in movies.csv along with movie ID
 path='website/recommedation/dataset/ml-latest-small/movies.csv'
 
 df = pd.read_csv(path, delimiter=',', header=None,names=['movie_id', 'title', 'genre'], engine='python')
 for i, row in df.iterrows():
-
     if i==0:
         continue
-
     movie_id = row['movie_id']
-    print(movie_id)
-
     if int(movie_id)<=6528:
         continue
     movie_title = row['title']
@@ -27,12 +24,10 @@ for i, row in df.iterrows():
         html = response.read()
 
         try:
-
             f = io.BytesIO(html)
             text = f"{f.read()}"
             str1 = "titlePosterImageModel"
             str2 = ".jpg"
-
             if "titleResults" in text:
                 ind = text.find(str1)
                 text_cut = text[ind:ind + 1000]
@@ -44,8 +39,6 @@ for i, row in df.iterrows():
                 writer.writerow([movie_id, link])
         except AttributeError:
                 pass
-
-
     except urllib.error.HTTPError:
             pass
 

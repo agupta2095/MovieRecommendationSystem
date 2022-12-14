@@ -3,9 +3,10 @@ import pickle
 import numpy as np
 from .utils import read_pickle
 import matplotlib.pyplot as plt
+
+#Collaborative Filtering
 def matrix_factorization(input_file="./dataset/UM_dictionary_old.pkl",
                          output_file="./dataset/matrix_factorized.pkl"):
-
 
     data = read_pickle(input_file)
 

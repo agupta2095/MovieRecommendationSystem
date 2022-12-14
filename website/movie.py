@@ -1,10 +1,10 @@
-import os
+
 from flask import Blueprint,request, render_template
 import pandas as pd
 from website.recommedation.content_based_filtering import get_dict_id_name,get_dict_movie, get_recommended_movies, get_ratings_content,val_to_key
 from website.recommedation.collaborative_filtering import get_ratings_collaborative
 from website.recommedation.utils import read_pickle, grab_highest_rated, get_poster
-from flask_login import login_user, login_required, logout_user, current_user
+from flask_login import login_required, current_user
 from .models import Watched, Recommendation
 from . import db
 import numpy as np
@@ -139,8 +139,6 @@ def submit_top_rated():
         if 'movie' in request.form:
             movieName = (request.form['movie'])
 
-
-
     new_watched = Watched(data=f"{movieName}:{movie_rating}", user_id=current_user.id)
     db.session.add(new_watched)
     db.session.commit()
@@ -170,29 +168,7 @@ def recommend2():
     print("Recommended movie ids")
     for r in current_user.recommended:
         print(r.data)
-
-
     return render_template('index.html', user=current_user, recommended_movie=output)
-#
-# @movie.route('/recommend',methods=['POST'])
-# @login_required
-# def recommend():
-#     features = [str(x) for x in request.form.values()]
-#     print(features)
-#     movie_name = str(features[0])
-#     movie_rating = float(features[1])
-#
-#     dict_id_name = get_dict_id_name()
-#     movieIds=get_movie_id([movie_name], dict_id_name)
-#
-#     user_ratings={}
-#     for id, rating in zip(movieIds,[movie_rating] ):
-#         user_ratings[id]=rating
-#     output=get_recommended_movies(user_ratings)
-#
-#     return render_template('index.html',user=current_user, recommended_movie=output)
-#
-#
 
 
 

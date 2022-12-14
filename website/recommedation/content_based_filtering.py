@@ -79,6 +79,7 @@ def get_dict_id_name():
     dict_id_name[entries["movieId"]]=entries["title"]
   return dict_id_name
 
+
 def search_movie(search_tag, movie_tag_matrix, dict_tag, dict_movie_id, dict_id_name, num_movies=4):
   for key, _ in dict_tag.items():
     if search_tag.lower() in key.lower():
@@ -95,22 +96,19 @@ def search_movie(search_tag, movie_tag_matrix, dict_tag, dict_movie_id, dict_id_
     movie_vector[ind]=-1e8
   return movieIds, [dict_id_name[movieId] for movieId in movieIds]
 
+
 def example():
   dict_movie_id, _ = get_dict_movie()
   dict_tag, total_tags =get_dict_tag()
   dict_id_name = get_dict_id_name()
   movie_tag_matrix = get_movie_matrix()
   movie_tag_corr = get_correlation_matrix(movie_tag_matrix)
-
-
   movieIds, movieNames=search_movie("caprio", movie_tag_matrix, dict_tag, dict_movie_id, dict_id_name, num_movies=2)
-
   user_ratings={}
 
   for movieId in movieIds:
     user_ratings[movieId]=5
   pred_ratings=content_based_ratings(movie_tag_corr, user_ratings, dict_movie_id)
-
 
   print("Watched Movies")
   for key, val in user_ratings.items():
@@ -126,7 +124,6 @@ def example():
     pred_ratings[ind]=-1e8
 
 
-
 def get_recommended_movies(user_ratings):
   dict_movie_id, _=get_dict_movie()
   dict_id_name =get_dict_id_name()
@@ -134,11 +131,8 @@ def get_recommended_movies(user_ratings):
   movie_tag_corr = get_correlation_matrix(movie_tag_matrix)
 
   pred_ratings = content_based_ratings(movie_tag_corr, user_ratings, dict_movie_id)
-
-
   for key, val in user_ratings.items():
     print(dict_id_name[key], val)
-
   print("================")
   print("Predicted Movies")
 
@@ -159,13 +153,11 @@ def get_recommended_movies(user_ratings):
 
 def get_ratings_content(user_ratings):
   dict_movie_id, _=get_dict_movie()
-  dict_id_name =get_dict_id_name()
   movie_tag_matrix = get_movie_matrix()
   movie_tag_corr = get_correlation_matrix(movie_tag_matrix)
 
   pred_ratings = content_based_ratings(movie_tag_corr, user_ratings, dict_movie_id)
   return pred_ratings
-
 
 
 if __name__=="__main__":

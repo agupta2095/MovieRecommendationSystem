@@ -1,12 +1,11 @@
 import pandas as pd
 import numpy as np
-import torch
 import pickle
 
+#Function to read data from dataset
 def path_to_matrix(input_file="website/recommendation/dataset/ml-latest-small/" , output_file="website/recommendation/dataset/UM_dictionary_old.pkl" ):
 
     data = pd.read_csv(input_file+"ratings.csv")
-    #print(data)
     for col in data:
       if col == "userId":
         unique_users=data[col].unique()

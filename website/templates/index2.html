@@ -50,13 +50,6 @@
                  </div>
                  {{ movie }}
              </h4>
-
-             <div class = "text-center">
-                 {% for j in range(5) %}
-                    <img src="{{ url_for('static',filename='rating.png') }}" width="50" height="50" id="star_{{i}}{{j}}">
-                 {% endfor %}
-
-             </div>
              <div class="text-center">
                  <form method='POST' action="/submit_top_rated">
                      <input type = "text", name="rating" placeholder="rating" required="required">

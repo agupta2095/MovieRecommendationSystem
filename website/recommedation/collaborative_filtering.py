@@ -22,7 +22,6 @@ def reshape_ratings(pred_ratings):
     pred_ratings=np.concatenate([pred_ratings, np.ones((18,))], axis=0)
     return pred_ratings
 def example():
-
     data_read = read_pickle(output_read_file)
     data_mf= read_pickle(output_mf_file)
 
@@ -64,8 +63,6 @@ def example():
 
 
     predicted_ratings=predicted_ratings*(np.sum((data_read["matrix"]>0), axis=0)>(watch_threshold*total_users))
-
-
     print("Predicting movies")
     for i in range(10):
         max_index=np.argmax(predicted_ratings)
@@ -86,16 +83,11 @@ def example():
 
 
 def get_ratings_collaborative(user_ratings):
-
     data_read = read_pickle(output_read_file)
     data_mf = read_pickle(output_mf_file)
 
     unique_movies=data_read["unique_movies"]
     V=data_mf["V"]
-
-
-
-
     watch_threshold = 0.2
     total_users = data_read["matrix"].shape[0]
 

@@ -1,12 +1,10 @@
 import pickle
-import random
 import numpy as np
 
 def read_pickle(file_path):
     file_to_read = open(file_path, "rb")
     data_read = pickle.load(file_to_read)
     return data_read
-
 
 def random(x):
     return 2*x
@@ -69,11 +67,8 @@ def get_genre_vector(user_ratings_dict,unique_movies, V):
     return predicted_rating.reshape(-1)
 
 def get_poster_link(id):
-    import csv
     import pandas as pd
-
     path = 'website/recommedation/dataset/ml-latest-small/movie_poster.csv'
-
     df = pd.read_csv(path, delimiter=',', header=None,  engine='python')
     for i, row in df.iterrows():
        if  row[0]==id:
